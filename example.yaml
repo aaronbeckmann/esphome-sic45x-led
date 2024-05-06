@@ -1,0 +1,64 @@
+esphome:
+  name: led-driver
+  friendly_name: LED Driver
+
+external_components:
+  - source: github://aaronbeckmann/esphome-sic45x-led@main
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+i2c:
+  - id: bus_main
+    sda: 17
+    scl: 18
+    scan: true
+    frequency: 400kHz
+
+sensor:
+  - platform: sic45x_led
+    id: led_1
+    i2c_id: bus_main
+    address: 0x1C
+    #Config for 6W AB Plant LED Panel
+    led_nominal_voltage: 3.1  #Volt
+    led_nominal_current: 0.15 #Ampere
+    leds_num_series: 3        #Num
+    leds_num_parallel: 4      #Num
+    #Optional Parameters and their defaults
+    # exceeding values will cause the controller to  
+    # disable output until the error has been resolved
+    overvoltage_tolerance: 0.05        #Ampere
+    overcurrent_tolerance: 0.05        #Ampere
+    minimum_input_voltage: 10.8        #Volt
+    minimum_enable_voltage: 10.0       #Volt
+    maximum_input_voltage: 20.0        #Volt
+    maximum_input_current: 8.0         #Ampere
+    maximum_operating_temperature: 100 #Deg C
+    output_power_limit_percent: 1.0    #% (0.0 - 1.0)
+    switching_frequency: 600           #kHz 300 - 1500kHz, resolution is 50 kHz
+    #For Calibration: use no calibration and 
+    # logger level > DEBUG to determine voltage values
+    #Two Point Calibration (total output voltage)
+    #Config for 6W AB Plant LED Panel
+    calibration_setpoint_low_voltage: 7.95 #Volt
+    calibration_setpoint_high_voltage: 9.3 #Volt
+    calibration_setpoint_low_percent: 0.0  #% (0.0 - 1.0)
+    calibration_setpoint_high_percent: 1.0 #% (0.0 - 1.0)
+    #One Point Calibration (total output voltage at 0% brightness)
+    #calibration_setpoint_low_voltage: 7.95
+    temperature: 
+      name: "led_1_controller_temp"
+    voltage: 
+      name: "led_1_voltage"
+    current: 
+      name: "led_1_current"
+    power: 
+      name: "led_1_power"
+
+number:
+  - platform: sic45x_led
+    controller_id: led_1
+    name: "led_1_brightness"
